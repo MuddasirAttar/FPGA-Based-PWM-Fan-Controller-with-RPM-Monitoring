@@ -1,46 +1,127 @@
-Fan Controller System Documentation
-Introduction
-The Fan Controller System enables users to control the fan speed using PWM (Pulse Width Modulation) and monitor the actual fan speed (RPM) using the fan’s tachometer signal. This system provides a simple register-based interface to set the desired RPM and read the actual RPM measured from the fan.
-System Overview
-The system consists of several modules that work together to manage fan operation:
-- Top Module: Integrates the entire system.
-- PWM Generator: Controls fan speed with a 20 kHz PWM signal.
-- Tachometer Reader: Measures the fan's actual RPM.
-- Bus Interface: Manages register-based communication for setting and reading RPM values.
-Modules and Their Functions
-1. Top Module
-The Top Module brings together the PWM generator, tachometer reader, and bus interface. It coordinates the internal signals to ensure proper fan speed control and feedback monitoring.
-Key Functions:
-- Receives the desired RPM value from the user.
-- Controls the fan using PWM output.
-- Monitors fan speed using tachometer input and updates the measured RPM register.
-2. PWM Generator
-The PWM Generator creates a 20 kHz signal to control the fan speed. The duty cycle of the signal determines how fast the fan will spin. This duty cycle is proportional to the RPM value set by the user.
-Key Signals:
-- pwm_out: Sends the PWM signal to the fan.
-- rpm_input: Receives the desired RPM from the bus interface.
-- clk: Clock input for PWM operation.
-3. Tachometer Reader
-The Tachometer Reader monitors the fan’s speed by counting pulses from the fan’s tachometer signal. The fan provides 4 pulses per revolution, and the system uses these pulses to calculate the RPM.
-Key Signals:
-- tach_signal: Receives pulses from the fan.
-- rpm_out: Outputs the measured RPM value.
-- clk: Clock input for pulse counting.
-4. Bus Interface
-The Bus Interface allows the user to interact with the fan system through registers. It provides two 32-bit registers:
-- Register 0: RPM Set Register – Stores the desired RPM value.
-- Register 1: RPM Get Register – Holds the measured RPM value.
-Key Signals:
-- write_data: Input to write the desired RPM.
-- read_data: Output for reading the stored or measured RPM.
-- bus_ena: Enables bus communication for reading and writing.
-- addr: Selects the register (0 for RPM set, 1 for RPM get).
-How to Use the System
-Setting the Fan Speed
-1. Write the desired RPM value (e.g., 2500) to Register 0.
-2. The PWM generator will adjust the fan speed based on the provided RPM.
-Reading the Measured RPM
-1. Monitor the fan’s speed through tachometer pulses.
-2. Read the actual RPM value from Register 1 to verify the fan's speed.
-Conclusion
-The Fan Controller System provides an easy-to-use interface for controlling and monitoring fan speed. Users can write the desired RPM to the set register and read the actual RPM from the get register. With its register-based design, the system ensures flexibility and scalability for various fan control applications.
+# **FPGA-Based PWM Fan Controller with RPM Monitoring**  
+
+## **Overview**  
+This project implements an **FPGA-based Fan Controller System** that enables precise **fan speed control** using **Pulse Width Modulation (PWM)** and real-time **RPM monitoring** via a tachometer. The system is designed in **VHDL** and tested on a **Xilinx Spartan-7 FPGA** (XC7S50-1CSGA324C) using **Vivado, ModelSim, and GTKWAVE**.  
+
+The system consists of three key modules:  
+- **PWM Generator** – Generates a **20 kHz PWM signal** to control fan speed.  
+- **Tachometer Reader** – Measures the **actual RPM** from the fan’s tachometer signal.  
+- **Bus Interface** – Provides a **register-based interface** for user interaction.  
+
+This project is useful for **embedded systems, industrial automation, and cooling solutions**, where precise fan speed control and monitoring are required.  
+
+---
+
+## **Features**  
+✅ **Precise Fan Speed Control** via **20 kHz PWM** generation.  
+✅ **Real-time RPM Monitoring** using **tachometer pulse counting (4 pulses per revolution)**.  
+✅ **Register-Based Interface** for setting and reading RPM values.  
+✅ **Tested on Xilinx Spartan-7 FPGA**, a **cost-effective ($100)** option for FPGA prototyping.  
+✅ **Designed & Verified using** **Vivado, ModelSim, and GTKWAVE**.  
+✅ **Scalable and Modular Design**, allowing easy integration into larger FPGA-based systems.  
+
+---
+
+## **Project Architecture**  
+The system is divided into the following VHDL modules:  
+
+### **1. Top Module (`top.vhd`)**  
+- **Integrates all components** (PWM Generator, Tachometer Reader, Bus Interface).  
+- **Receives user-defined RPM value** and controls fan speed accordingly.  
+- **Monitors real-time RPM feedback** from the fan and updates the register.  
+
+### **2. PWM Generator (`pwm_gen.vhd`)**  
+- Generates a **20 kHz PWM signal** with a duty cycle proportional to the **desired RPM**.  
+- **Takes RPM input** from the Bus Interface and adjusts the **PWM duty cycle** dynamically.  
+- **Outputs `pwm_out` signal** to control the fan’s speed.  
+
+### **3. Tachometer Reader (`techo_reader.vhd`)**  
+- **Counts tachometer pulses** to determine **actual fan RPM**.  
+- **Outputs RPM value** to the Bus Interface.  
+- Uses a **4 pulses per revolution** calculation method for accurate RPM monitoring.  
+
+### **4. Bus Interface (`bus_if.vhd`)**  
+- Implements a **register-based communication system** for RPM control.  
+- Provides two **32-bit registers**:  
+  - **Register 0:** Stores **desired RPM** (write operation).  
+  - **Register 1:** Stores **measured RPM** (read operation).  
+- Supports **100 MHz bus clock timing** for smooth operation.  
+
+---
+
+## **Block Diagram**  
+```plaintext
+           +-------------------------------------------+
+           |           FPGA Fan Controller            |
+           |-------------------------------------------|
+           |  +-------------+   +-----------------+   |
+User Input |  | Bus Interface|-->| PWM Generator  |--> PWM Output (Fan)
+ (RPM Set) |  +-------------+   +-----------------+   |
+           |      |                    |              |
+           |      v                    v              |
+           |  +-------------+   +-----------------+   |
+  Fan RPM  |  | RPM Register|<--| Tachometer Read |<-- Tachometer Input (Fan)
+  Feedback |  +-------------+   +-----------------+   |
+           +-------------------------------------------+
+```
+
+---
+
+## **Hardware and Tools Used**  
+### **FPGA Board:**  
+- **Xilinx Spartan-7 FPGA** (**XC7S50-1CSGA324C**) – Cost-effective (~$100).  
+
+### **Development Tools:**  
+- **Vivado** (for synthesis, implementation, and debugging).  
+- **ModelSim** (for VHDL simulation and verification).  
+- **GTKWAVE** (for waveform analysis and debugging).  
+
+### **Fan Hardware:**  
+- **Delta Electronics EFC0812DB-F00** (DC Fan with PWM & Tachometer).  
+
+---
+
+## **Getting Started**  
+### **1. Clone the Repository**  
+```bash
+git clone https://github.com/yourusername/FPGA-Fan-Controller.git
+cd FPGA-Fan-Controller
+```
+
+### **2. Open in Vivado**  
+1. Launch **Vivado**.  
+2. Create a new project and select **Xilinx Spartan-7 FPGA (XC7S50-1CSGA324C)**.  
+3. Add **VHDL source files** (`top.vhd`, `pwm_gen.vhd`, `techo_reader.vhd`, `bus_if.vhd`).  
+4. Implement and generate the bitstream.  
+
+### **3. Simulation with ModelSim**  
+1. Open **ModelSim**.  
+2. Load the testbench files.  
+3. Run the simulation and verify PWM and RPM signals.  
+
+### **4. Hardware Testing**  
+- Connect the **Delta EFC0812DB-F00 fan** to the FPGA.  
+- Set an RPM value using the **register-based interface**.  
+- Observe PWM duty cycle changes and validate measured RPM.  
+
+---
+
+## **Results & Verification**  
+✅ **Achieved precise fan speed control** with **accurate RPM measurement**.  
+✅ **Verified digital design using ModelSim** (Functional Simulation).  
+✅ **Tested hardware with real fan and FPGA implementation**.  
+✅ **Met timing constraints and 100 MHz bus clock synchronization**.  
+
+---
+
+## **Future Enhancements**  
+🚀 **Implement AXI Interface** for integration with SoC-based designs.  
+🚀 **Add I2C/SPI support** for external sensor communication.  
+🚀 **Enhance RPM control algorithm** for **better dynamic fan speed adjustments**.  
+
+
+
+## Contributors 
+📧 Contact: muddasirattar1999@gmail.com 
+
+---
