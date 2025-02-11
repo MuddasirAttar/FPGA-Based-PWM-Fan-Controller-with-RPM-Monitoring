@@ -84,8 +84,8 @@ User Input |  | Bus Interface|-->| PWM Generator  |--> PWM Output (Fan)
 ## **Getting Started**  
 ### **1. Clone the Repository**  
 ```bash
-git clone https://github.com/yourusername/FPGA-Fan-Controller.git
-cd FPGA-Fan-Controller
+git clone https://github.com/MuddasirAttar/FPGA-Based-PWM-Fan-Controller-with-RPM-Monitoring.git
+cd FPGA-Based-PWM-Fan-Controller-with-RPM-Monitoring
 ```
 
 ### **2. Open in Vivado**  
